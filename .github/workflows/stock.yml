@@ -25,5 +25,5 @@ jobs:
     - name: Run script
       env:
         API_KEY: ${{ secrets.API_KEY }}
-        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-      run: python your_script.py
+        Webhook_url: ${{ secrets.Webhook_url }}
+      run: python get_stock_info.py
