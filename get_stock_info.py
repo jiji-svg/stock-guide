@@ -15,7 +15,7 @@ os.makedirs(data_path, exist_ok=True)
 
 # 주요 키들 불러오기
 API_KEY = os.getenv("API_KEY")
-weebhook_url = os.getenv("Webhook_url")
+webhook_url = os.getenv("Webhook_url")
 
 # NVIDIA, Microsoft(OpenAI), Alphabet(구글), Amazon(AWS 클라우드 AI 서비스), Meta, 삼전 순으로
 symbols = ["NVDA", "MSFT", "GOOGL", "AMZN", "META"]
@@ -43,25 +43,29 @@ for count, (sym, name) in enumerate(zip(symbols, names)):
         latest_date = sorted(weekly_data.keys(), reverse=True)[0]
         latest_info = weekly_data[latest_date]
 
-        needed_datas = {}
+        msg = f"📌 *{name} ({sym})* — {latest_date}\n"
         for key, value in latest_info.items():
             print(f"{key}: {value}")
-            needed_datas[key] = value
+            msg += f"- {key}: {value}\n"
         
-        middle_data.append(needed_datas)
+        middle_data.append(msg)
         
     else:
         print(f"{name} 호출 실패, 상태 코드: {response.status_code}")
 if response.status_code == 200:
     # csv 파일로 저장.
-    csv_file = os.path.join(data_path,f"{now}.csv")
+    # csv_file = os.path.join(data_path,f"{now}.csv")
     
-    for data, n in zip(middle_data,names):
-        data['company'] = n
-    final_data = pd.DataFrame(middle_data)
-    final_data.set_index('company', inplace=True)
-    final_data.to_csv(csv_file, encoding='utf-8-sig')
+    # for data, n in zip(middle_data,names):
+    #     data['company'] = n
+    # final_data = pd.DataFrame(middle_data)
+    # final_data.set_index('company', inplace=True)
+    # final_data.to_csv(csv_file, encoding='utf-8-sig')
 
+    # slack으로 전송
+    final_message = f"📊 *주간 AI 빅테크 주가 업데이트 ({now})*\n\n" + "\n\n".join(middle_data)
+    
+    requests.post(webhook_url, json={"text": final_message})
 # print(response.status_code)
 '''
 200 → 정상
